@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script type="application/javascript" src="lib/jquery-1.8.2.min.js"></script>
+    <script type="application/javascript" src="city.js"></script>
+</head>
+<body>
+<script type="application/javascript">
+    function list_city(root,opt_func,deep,end_func){
+        if(!arguments[2]) deep = 0;
+        if(!arguments[3]){
+            end_func = function(){console.log("stop...")};
+        }
+        root.forEach(function(value,index){
+            opt_func(value,deep);
+            if(value['_child']!=undefined){
+                list_city(value._child,opt_func,deep+1,end_func);
+            }else{
+                end_func(deep);//调用终结函数
+            }
+        });
+    }
+    function print(value,deep){
+        var s = [];
+        s.push(value.id);
+        s.push(value.title);
+        s.push(value.pid);
+        console.log(s.join(","));
+    }
+    var global_arr = [];
+    function generate_query(value,deep){
+//        console.log("deep="+deep);
+        if(deep==0){
+            global_arr = [];
+            global_arr.push("province="+value.id);
+        }else if(deep==1){
+            if(global_arr.length==2){
+                global_arr.pop();
+            }
+            global_arr.push("city="+value.id);
+        }else if(deep==2){
+            global_arr.push("area="+value.id);
+        }
+    }
+    function end_func(deep){
+        console.log(global_arr.join("&"));
+        global_arr.pop();
+    }
+    $(function(){
+//        list_city(all_city,print);
+        list_city(all_city,generate_query,0,end_func);
+//        console.log(typeof(end_func)=="function")
+    });
+
+</script>
+</body>
+</html>
